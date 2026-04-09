@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>PrevCar Bosch Service - Guincho e Assistência 24h em Icó</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ed0007", // Professional Bosch Red
+                        "brand-blue": "#003a70", // Bosch-style professional blue
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#1a1a1a",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        html, body {
+            overflow-x: hidden;
+            font-family: 'Public Sans', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        @keyframes pin-jump {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-6px);
+            }
+        }
+
+        .animate-pin-jump {
+            display: inline-block;
+            animation: pin-jump 2s ease-in-out infinite;
+        }
+
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            height: 400px; /* Taller for larger images */
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 1200px;
+            z-index: 10;
+            overflow: visible; /* Needed for 3D but parent will clip */
+        }
+
+        .carousel-slide {
+            position: absolute;
+            width: 70vw;
+            max-width: 280px;
+            height: 360px;
+            opacity: 0;
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateX(0) scale(0.4) translateZ(-500px);
+            cursor: pointer;
+            border-radius: 2rem;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            will-change: transform, opacity;
+            pointer-events: none; /* Disable by default */
+        }
+
+        @media (min-width: 768px) {
+            .carousel-container {
+                height: 550px;
+            }
+            .carousel-slide {
+                width: 380px;
+                height: 500px;
+            }
+        }
+
+        .carousel-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.5) blur(1px);
+            transition: all 0.6s ease;
+        }
+
+        /* 3D Positions - Closer & Larger */
+        .carousel-slide.active {
+            opacity: 1;
+            transform: translateX(0) scale(1) translateZ(0);
+            z-index: 20;
+            border-color: rgba(237, 0, 7, 0.5);
+            pointer-events: auto; /* Enable for active */
+        }
+        .carousel-slide.active img {
+            filter: brightness(1) blur(0);
+        }
+
+        .carousel-slide.prev {
+            opacity: 0.7;
+            transform: translateX(-70%) scale(0.8) translateZ(-250px) rotateY(15deg); /* Closer distance */
+            z-index: 10;
+            pointer-events: auto;
+        }
+
+        .carousel-slide.next {
+            opacity: 0.7;
+            transform: translateX(70%) scale(0.8) translateZ(-250px) rotateY(-15deg); /* Closer distance */
+            z-index: 10;
+            pointer-events: auto;
+        }
+
+        .carousel-slide.hidden-left {
+            opacity: 0;
+            transform: translateX(-150%) scale(0.4) translateZ(-600px);
+        }
+
+        .carousel-slide.hidden-right {
+            opacity: 0;
+            transform: translateX(150%) scale(0.4) translateZ(-600px);
+        }
+
+        .carousel-overlay {
+            display: none; /* Removed for this style */
+        }
+
+        .carousel-tabs {
+            display: flex;
+            gap: 0.35rem;
+            z-index: 30;
+            margin-top: 2rem;
+            overflow-x: auto;
+            max-width: 100%;
+            justify-content: flex-start;
+            padding-bottom: 0.5rem;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        @media (min-width: 768px) {
+            .carousel-tabs {
+                gap: 0.75rem;
+                justify-content: flex-start;
+            }
+            .carousel-tab { 
+                padding: 0.6rem 1.25rem !important; 
+                font-size: 0.75rem !important; 
+                border-radius: 0.75rem !important; 
+            }
+        }
+
+        .carousel-tabs::-webkit-scrollbar {
+            display: none; /* Hide scrollbar Chrome/Safari */
+        }
+
+        .carousel-tab {
+            flex: 0 0 auto; /* Prevent shrinking */
+            padding: 0.4rem 0.8rem;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0.5rem;
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+
+        .carousel-tab.active {
+            background: var(--primary, #ed0007);
+            border-color: transparent;
+            box-shadow: 0 10px 15px -3px rgba(237, 0, 7, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .carousel-tab:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100">
+    <!-- Top Navigation -->
+    <header
+        class="sticky top-0 z-50 w-full bg-white/90 dark:bg-brand-blue/95 backdrop-blur-md border-b border-slate-200 dark:border-brand-blue/30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <a href="https://wa.me/5588997535053" target="_blank"
+                    class="flex items-center h-8 sm:h-10 hover:opacity-80 transition-opacity">
+                    <img alt="PrevCar Bosch Service Logo" class="h-full w-auto object-contain" src="logo.png" />
+                </a>
+                <nav class="hidden md:flex items-center gap-8">
+                    <a class="text-sm font-semibold hover:text-primary transition-colors" href="#inicio">Início</a>
+                    <a class="text-sm font-semibold hover:text-primary transition-colors" href="#servicos">Serviços</a>
+                    <a class="text-sm font-semibold hover:text-primary transition-colors" href="#sobre">Sobre Nós</a>
+                    <a class="text-sm font-semibold hover:text-primary transition-colors" href="#contato">Contato</a>
+                </nav>
+                <div class="flex items-center gap-4">
+                    <a href="https://wa.me/5588998333235" target="_blank"
+                        class="hidden sm:flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-primary/20">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                        WhatsApp
+                    </a>
+                    <button class="md:hidden text-brand-blue dark:text-white p-2" id="mobile-menu-btn">
+                        <span class="material-symbols-outlined text-3xl">menu</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Overlay -->
+        <div class="fixed inset-0 bg-brand-blue/98 z-[60] flex flex-col p-8 transition-all duration-300 translate-x-full invisible pointer-events-none" id="mobile-menu">
+            <div class="flex justify-between items-center mb-12">
+                <img alt="Logo" class="h-8 w-auto grayscale brightness-0 invert" src="logo.png" />
+                <button class="text-white p-2" id="mobile-close-btn">
+                    <span class="material-symbols-outlined text-4xl">close</span>
+                </button>
+            </div>
+            <nav class="flex flex-col gap-6 text-center">
+                <a class="text-2xl font-bold text-white hover:text-primary transition-colors" href="#inicio">Início</a>
+                <a class="text-2xl font-bold text-white hover:text-primary transition-colors" href="#servicos">Serviços</a>
+                <a class="text-2xl font-bold text-white hover:text-primary transition-colors" href="#sobre">Sobre Nós</a>
+                <a class="text-2xl font-bold text-white hover:text-primary transition-colors" href="#contato">Contato</a>
+            </nav>
+        </div>
+    </header>
+    <!-- Hero Section -->
+    <section class="relative min-h-[1100px] sm:min-h-[1000px] lg:h-screen lg:min-h-[850px] flex items-center bg-gradient-to-b from-brand-blue to-slate-900 pt-28 pb-12 lg:py-0 overflow-hidden" id="inicio">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 w-full overflow-visible">
+            <div class="flex flex-col lg:flex-row items-center gap-4 lg:gap-16 text-center lg:text-left h-full">
+                <!-- Text Content -->
+                <div class="flex-1 space-y-6 lg:space-y-8 py-8 w-full min-w-0">
+                    <a href="https://maps.app.goo.gl/2t3YxqmqvnPVe3To8" target="_blank"
+                        class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md text-white hover:bg-white/20 transition-colors px-4 py-1.5 rounded-full text-xs font-bold border border-white/20 cursor-pointer shadow-sm">
+                        <span class="material-symbols-outlined text-sm">location_on</span>
+                        Atendimento em Icó e Região
+                    </a>
+                    <h1 class="text-4xl sm:text-5xl lg:text-7xl font-black text-white leading-tight lg:leading-none tracking-tighter break-words">
+                        Precisa de <span class="text-primary italic">Máquinas e Reboque?</span> <br />
+                        <span class="text-white">Suporte Pesado Seguro.</span>
+                    </h1>
+                    <p class="text-base sm:text-lg text-blue-50 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium opacity-80 break-words">
+                        O <a href="https://www.instagram.com/prevcarboschservice/" target="_blank"
+                            class="font-bold text-white hover:underline transition-all underline-offset-4">Grupo PrevCar</a> tem a força e tradição necessárias para apoiar suas obras e transportes pesados com agilidade.
+                    </p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 max-w-xs sm:max-w-xl mx-auto lg:mx-0 pt-4">
+                        <a href="https://wa.me/5588998333235" target="_blank" class="w-full flex flex-col items-center justify-center gap-0.5 bg-primary hover:bg-primary/90 text-white p-2 sm:px-5 sm:py-3 rounded-lg sm:rounded-xl transition-all shadow-lg active:scale-95 group text-center overflow-hidden">
+                            <span class="font-black text-[11px] sm:text-base italic leading-tight break-words">Motorista 01</span>
+                            <span class="text-[7px] sm:text-[9px] opacity-70 font-bold tracking-widest leading-none break-words">(88) 99833-3235</span>
+                        </a>
+                        <a href="https://wa.me/5588981239215" target="_blank" class="w-full flex flex-col items-center justify-center gap-0.5 bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white p-2 sm:px-5 sm:py-3 rounded-lg sm:rounded-xl transition-all active:scale-95 group text-center overflow-hidden">
+                            <span class="font-black text-[11px] sm:text-base italic text-white leading-tight break-words">Motorista 02</span>
+                            <span class="text-[7px] sm:text-[9px] opacity-70 font-bold tracking-widest leading-none text-blue-50 break-words">(88) 98123-9215</span>
+                        </a>
+                        <a href="https://wa.me/5588999815020" target="_blank" class="w-full flex flex-col items-center justify-center gap-0.5 bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white p-2 sm:px-5 sm:py-3 rounded-lg sm:rounded-xl transition-all active:scale-95 group text-center overflow-hidden">
+                            <span class="font-black text-[11px] sm:text-base italic text-white leading-tight break-words">Motorista 03</span>
+                            <span class="text-[7px] sm:text-[9px] opacity-70 font-bold tracking-widest leading-none text-blue-50 break-words">(88) 99981-5020</span>
+                        </a>
+                        <a href="tel:+558835615048" class="w-full flex flex-col items-center justify-center gap-0.5 bg-white text-brand-blue hover:bg-blue-50 p-2 sm:px-5 sm:py-3 rounded-lg sm:rounded-xl transition-all shadow-md active:scale-95 text-center overflow-hidden">
+                            <span class="font-black text-[11px] sm:text-base italic leading-tight break-words">Linha Fixa</span>
+                            <span class="text-[7px] sm:text-[9px] opacity-70 font-bold tracking-widest leading-none break-words">(88) 3561-5048</span>
+                        </a>
+                    </div>
+                    
+                    <!-- Manual Navigation Tabs -->
+                    <div class="carousel-tabs" id="indicators">
+                        <!-- Tabs generated by JS -->
+                    </div>
+                </div>
+
+                <!-- 3D CAROUSEL (Side Position) -->
+                <div class="flex-1 w-full max-w-2xl">
+                    <div class="carousel-container" id="hero-carousel">
+                        <!-- Slides -->
+                        <div class="carousel-slide" onclick="goToSlide(0)">
+                            <img alt="Serviço PrevCar 1" src="WhatsApp Image 2026-03-31 at 16.03.54.jpeg" />
+                        </div>
+                        <div class="carousel-slide" onclick="goToSlide(1)">
+                            <img alt="Serviço PrevCar 2" src="WhatsApp Image 2026-03-31 at 16.03.55 (1).jpeg" />
+                        </div>
+                        <div class="carousel-slide" onclick="goToSlide(2)">
+                            <img alt="Serviço PrevCar 3" src="WhatsApp Image 2026-03-31 at 16.03.55 (2).jpeg" />
+                        </div>
+                        <div class="carousel-slide" onclick="goToSlide(3)">
+                            <img alt="Serviço PrevCar 4" src="WhatsApp Image 2026-03-31 at 16.03.55 (3).jpeg" />
+                        </div>
+                        <div class="carousel-slide" onclick="goToSlide(4)">
+                            <img alt="Serviço PrevCar 5" src="WhatsApp Image 2026-03-31 at 16.03.55 (4).jpeg" />
+                        </div>
+                        <div class="carousel-slide" onclick="goToSlide(5)">
+                            <img alt="Serviço PrevCar 6" src="WhatsApp Image 2026-03-31 at 16.03.55.jpeg" />
+                        </div>
+                        <div class="carousel-slide" onclick="goToSlide(6)">
+                            <img alt="Serviço PrevCar 7" src="WhatsApp Image 2026-03-31 at 16.03.56.jpeg" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Grid -->
+    <section class="py-24 bg-white dark:bg-slate-900" id="servicos">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 space-y-4">
+                <h2 class="text-primary font-bold tracking-widest uppercase text-sm">O que fazemos</h2>
+                <h3 class="text-3xl lg:text-4xl font-black text-slate-900 dark:text-white">Serviços Especializados 24h
+                </h3>
+                <p class="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">Assistência completa para garantir sua
+                    segurança e tranquilidade em qualquer imprevisto na estrada.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Service 1 -->
+                <div
+                    class="group bg-background-light dark:bg-brand-blue/10 p-8 rounded-2xl border border-slate-100 dark:border-brand-blue/20 hover:border-primary/50 transition-all hover:shadow-xl">
+                    <div
+                        class="bg-primary/10 text-primary w-14 h-14 rounded-xl flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-all">
+                        <span class="material-symbols-outlined text-3xl">local_shipping</span>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3">Reboque 24h</h4>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">Suporte disponível a qualquer
+                        hora para veículos leves e utilitários em Icó.</p>
+                </div>
+                <!-- Service 2 -->
+                <div
+                    class="group bg-background-light dark:bg-brand-blue/10 p-8 rounded-2xl border border-slate-100 dark:border-brand-blue/20 hover:border-primary/50 transition-all hover:shadow-xl">
+                    <div
+                        class="bg-primary/10 text-primary w-14 h-14 rounded-xl flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-all">
+                        <span class="material-symbols-outlined text-3xl">route</span>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3">Assistência em Viagem</h4>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">Transporte seguro para você e
+                        sua família em trajetos longos e interestaduais.</p>
+                </div>
+                <!-- Service 3 -->
+                <div
+                    class="group bg-background-light dark:bg-brand-blue/10 p-8 rounded-2xl border border-slate-100 dark:border-brand-blue/20 hover:border-primary/50 transition-all hover:shadow-xl">
+                    <div
+                        class="bg-primary/10 text-primary w-14 h-14 rounded-xl flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-all">
+                        <span class="material-symbols-outlined text-3xl">build</span>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3">Socorro Mecânico</h4>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">Reparos rápidos no local:
+                        bateria, pneus e pequenos ajustes elétricos.</p>
+                </div>
+                <!-- Service 4 -->
+                <div
+                    class="group bg-background-light dark:bg-brand-blue/10 p-8 rounded-2xl border border-slate-100 dark:border-brand-blue/20 hover:border-primary/50 transition-all hover:shadow-xl">
+                    <div
+                        class="bg-primary/10 text-primary w-14 h-14 rounded-xl flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-all">
+                        <span class="material-symbols-outlined text-3xl">motorcycle</span>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3">Resgate de Motos</h4>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">Equipamento especializado para
+                        o transporte seguro de motocicletas de todas as cilindradas.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Why Choose Us -->
+    <section class="py-24 bg-brand-blue text-white overflow-hidden relative">
+        <div class="absolute top-0 right-0 w-1/3 h-full opacity-10">
+            <span class="material-symbols-outlined text-[400px]">verified_user</span>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+                <div>
+                    <h2 class="text-primary font-bold tracking-widest uppercase text-xs lg:text-sm mb-3">Diferenciais <a
+                            href="https://www.instagram.com/prevcarboschservice/" target="_blank"
+                            class="hover:underline">PrevCar</a></h2>
+                    <h3 class="text-3xl sm:text-4xl lg:text-5xl font-black mb-6 lg:mb-8 leading-tight">Excelência Bosch
+                        Service em cada quilômetro.</h3>
+                    <div class="space-y-4 lg:space-y-6">
+                        <div class="flex gap-5">
+                            <div
+                                class="shrink-0 bg-white/10 w-12 h-12 rounded-full flex items-center justify-center border border-white/20">
+                                <span class="material-symbols-outlined text-primary">schedule</span>
+                            </div>
+                            <div>
+                                <h5 class="text-lg font-bold mb-1">Resposta Rápida</h5>
+                                <p class="text-blue-100/70">Nossa base em Icó garante que cheguemos ao seu local no
+                                    menor tempo possível.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-5">
+                            <div
+                                class="shrink-0 bg-white/10 w-12 h-12 rounded-full flex items-center justify-center border border-white/20">
+                                <span class="material-symbols-outlined text-primary">engineering</span>
+                            </div>
+                            <div>
+                                <h5 class="text-lg font-bold mb-1">Equipe Qualificada</h5>
+                                <p class="text-blue-100/70">Profissionais treinados sob os rígidos padrões
+                                    internacionais da rede Bosch.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 lg:gap-5">
+                            <div
+                                class="shrink-0 bg-white/10 w-10 h-10 lg:w-12 lg:h-12 rounded-full flex items-center justify-center border border-white/20">
+                                <span class="material-symbols-outlined text-primary text-xl lg:text-2xl">security</span>
+                            </div>
+                            <div>
+                                <h5 class="text-base lg:text-lg font-bold mb-1">Segurança Total</h5>
+                                <p class="text-sm lg:text-base text-blue-100/70">Veículos segurados e transporte com
+                                    equipamentos de última geração.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white/5 p-4 rounded-3xl border border-white/10">
+                    <img alt="Equipe PrevCar Bosch Service" class="rounded-2xl w-full object-cover shadow-2xl"
+                        src="equipe-prevcar.png" />
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Service Area Section -->
+    <section class="py-24 bg-background-light dark:bg-background-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col lg:flex-row gap-12 items-center">
+                <a href="https://maps.app.goo.gl/2t3YxqmqvnPVe3To8" target="_blank"
+                    class="block flex-1 w-full h-[400px] bg-slate-200 dark:bg-slate-800 rounded-3xl overflow-hidden shadow-inner relative group cursor-pointer hover:shadow-2xl transition-all">
+                    <img alt="Mapa de Icó"
+                        class="w-full h-full object-cover opacity-90 group-hover:scale-105 group-hover:opacity-100 transition-all duration-700"
+                        src="mapa_ico.png" />
+                    <div
+                        class="absolute inset-0 bg-brand-blue/10 group-hover:bg-transparent transition-colors duration-500">
+                    </div>
+                    <div
+                        class="absolute bottom-6 left-6 bg-white dark:bg-brand-blue p-4 rounded-xl shadow-lg border border-slate-100 dark:border-brand-blue/30 group-hover:-translate-y-2 transition-transform duration-300">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span
+                                class="w-2 h-2 bg-primary rounded-full animate-pulse shadow-[0_0_8px_rgba(237,0,7,0.8)]"></span>
+                            <span
+                                class="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-blue-200">Sede
+                                Operacional</span>
+                        </div>
+                        <p class="font-bold text-lg dark:text-white flex items-center gap-2">Icó, Ceará <span
+                                class="material-symbols-outlined text-sm">open_in_new</span></p>
+                    </div>
+                </a>
+                <div class="flex-1 space-y-6">
+                    <h3 class="text-3xl font-black text-slate-900 dark:text-white">Presença Local, Alcance Regional</h3>
+                    <p class="text-lg text-slate-600 dark:text-slate-400">
+                        Estamos estrategicamente posicionados em Icó para atender com agilidade toda a microrregião e as
+                        principais rodovias que cortam o sertão cearense.
+                    </p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div
+                            class="flex items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700">
+                            <span class="material-symbols-outlined text-primary">check_circle</span>
+                            <span class="font-medium">Orós</span>
+                        </div>
+                        <div
+                            class="flex items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700">
+                            <span class="material-symbols-outlined text-primary">check_circle</span>
+                            <span class="font-medium">Iguatu</span>
+                        </div>
+                        <div
+                            class="flex items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700">
+                            <span class="material-symbols-outlined text-primary">check_circle</span>
+                            <span class="font-medium">Cedro</span>
+                        </div>
+                        <div
+                            class="flex items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700">
+                            <span class="material-symbols-outlined text-primary">check_circle</span>
+                            <span class="font-medium">Umari</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Institutional / Grupo PrevCar -->
+    <section class="py-24 border-t border-slate-200 dark:border-slate-800" id="sobre">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="inline-block mb-10">
+                <div
+                    class="bg-white dark:bg-slate-800 p-4 lg:p-6 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700">
+                    <img alt="Grupo PrevCar Oficial" class="h-12 lg:h-16 w-auto object-contain mx-auto"
+                        src="logo.png" />
+                </div>
+            </div>
+            <h3 class="text-2xl lg:text-3xl font-black mb-4 lg:mb-6">Tradição, Força e Confiança</h3>
+            <div
+                class="max-w-3xl mx-auto space-y-3 lg:space-y-4 text-slate-600 dark:text-slate-400 text-base lg:text-lg leading-relaxed text-left md:text-center">
+                <p>
+                    O <strong><a href="https://www.instagram.com/prevcarboschservice/" target="_blank"
+                            class="text-brand-blue dark:text-blue-400 hover:underline">Grupo PrevCar</a></strong> é muito mais do que um serviço de reboque. Somos a principal força de apoio estrutural no coração do Ceará, localizados estrategicamente em Icó, com excelência em soluções para o transporte pesado e movimentação de cargas.
+                </p>
+                <p>
+                    Especialistas em <strong>Máquinas, Munck e Reboques</strong>, oferecemos um suporte completo e robusto para qualquer desafio no campo, em obras ou nas rodovias. Equipamentos de última geração e profissionais altamente capacitados garantem segurança máxima do início ao fim do seu trajeto.
+                </p>
+                <p>
+                    Com nossa frota pesada constantemente revisada e uma equipe pronta para socorrer nas situações mais adversas, nosso maior compromisso é garantir a integridade do seu equipamento e entregar resultados com total agilidade e confiança, independentemente do peso do trabalho.
+                </p>
+            </div>
+        </div>
+    </section>
+    <!-- Final CTA -->
+    <section class="py-20 bg-brand-blue relative overflow-hidden">
+        <div class="absolute inset-0 opacity-20">
+            <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-brand-blue to-primary/40"></div>
+        </div>
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+            <h2 class="text-4xl lg:text-5xl font-black text-white mb-6">Precisa de ajuda agora?</h2>
+            <p class="text-xl text-blue-100 mb-10">Não espere no acostamento. Entre em contato e solicite suporte
+                imediato com quem entende do assunto.</p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="https://wa.me/5588997535053" target="_blank"
+                    class="flex items-center justify-center gap-3 bg-primary hover:bg-primary/90 text-white px-10 py-5 rounded-2xl font-black text-xl transition-all shadow-2xl shadow-primary/30">
+                    <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+                    </svg>
+                    WhatsApp 24h
+                </a>
+                <a href="tel:+558835615048"
+                    class="flex items-center justify-center gap-3 bg-white text-brand-blue hover:bg-blue-50 px-10 py-5 rounded-2xl font-black text-xl transition-all shadow-2xl shadow-black/20">
+                    <span class="material-symbols-outlined text-2xl">phone_in_talk</span>
+                    Ligar Imediato
+                </a>
+            </div>
+        </div>
+    </section>
+    <!-- Footer -->
+    <footer class="bg-slate-50 dark:bg-slate-950 pt-20 pb-10 border-t border-slate-200 dark:border-slate-900"
+        id="contato">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+                <!-- Brand Column -->
+                <div class="space-y-6">
+                    <a href="#inicio" class="flex items-center h-10">
+                        <img alt="PrevCar Logo" class="h-full w-auto object-contain dark:invert" src="logo.png" />
+                    </a>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                        Sua segurança é nossa prioridade. Oferecemos assistência automotiva e guincho 24h com o padrão
+                        de qualidade Bosch Service em Icó e região.
+                    </p>
+                    <div class="flex gap-4">
+                        <a href="https://www.instagram.com/prevcarboschservice/" target="_blank"
+                            class="w-10 h-10 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all shadow-sm">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.332 3.608 1.308.975.975 1.246 2.242 1.308 3.608.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.062 1.366-.332 2.633-1.308 3.608-.975.975-2.242 1.246-3.608 1.308-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.366-.062-2.633-.332-3.608-1.308-.975-.975-1.246-2.242-1.308-3.608-.058-1.266-.07-1.646-.07-4.85s.012-3.584.07-4.85c.062-1.366.332-2.633 1.308-3.608.975-.975 2.242-1.246 3.608-1.308 1.266-.058 1.646-.07 4.85-.07M12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.981 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.981-6.98.058-1.28.072-1.689.072-4.948 0-3.259-.014-3.668-.072-4.948-.2-4.353-2.612-6.78-6.981-6.981C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+                            </svg>
+                        </a>
+                        <a href="https://wa.me/5588997535053" target="_blank"
+                            class="w-10 h-10 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all shadow-sm">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="space-y-6">
+                    <h4 class="text-sm font-bold uppercase tracking-widest text-slate-900 dark:text-white">Navegação
+                    </h4>
+                    <nav class="flex flex-col gap-3">
+                        <a href="#inicio"
+                            class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm">Início</a>
+                        <a href="#servicos"
+                            class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm">Serviços</a>
+                        <a href="#sobre"
+                            class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm">Sobre
+                            Nós</a>
+                        <a href="#contato"
+                            class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm">Contato</a>
+                    </nav>
+                </div>
+
+                <!-- Contact Info -->
+                <div class="space-y-6">
+                    <h4 class="text-sm font-bold uppercase tracking-widest text-slate-900 dark:text-white">Contato</h4>
+                    <div class="flex flex-col gap-4">
+                        <a href="https://maps.app.goo.gl/2t3YxqmqvnPVe3To8" target="_blank"
+                            class="flex items-start gap-3 group/loc cursor-pointer hover:bg-white dark:hover:bg-slate-900 p-2 -m-2 rounded-xl transition-all duration-300 active:scale-95">
+                            <span
+                                class="material-symbols-outlined text-primary text-xl animate-pin-jump translate-y-0 group-hover/loc:-translate-y-1 transition-transform duration-300">location_on</span>
+                            <p
+                                class="text-slate-600 dark:text-slate-400 text-sm group-hover/loc:text-primary transition-colors duration-300">
+                                R. Dr. Vilmar Ferreira, s/n - Icó, CE<br />
+                                CEP 63430-000
+                            </p>
+                        </a>
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-primary text-xl">call</span>
+                            <a href="tel:+558835615048"
+                                class="text-slate-600 dark:text-slate-400 hover:text-primary text-sm">(88) 3561-5048</a>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-primary text-xl">mail</span>
+                            <a href="mailto:contato@prevcar.com.br"
+                                class="text-slate-600 dark:text-slate-400 hover:text-primary text-sm">contato@prevcar.com.br</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status -->
+                <div class="space-y-6">
+                    <h4 class="text-sm font-bold uppercase tracking-widest text-slate-900 dark:text-white">Funcionamento
+                    </h4>
+                    <div class="bg-primary/5 dark:bg-primary/10 p-5 rounded-2xl border border-primary/20">
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
+                            <span class="font-bold text-sm text-primary">Disponível Agora</span>
+                        </div>
+                        <p class="text-slate-900 dark:text-white font-black text-lg">Suporte 24 Horas</p>
+                        <p class="text-slate-600 dark:text-slate-400 text-xs mt-1">Todos os dias, inclusive feriados.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Bar -->
+            <div
+                class="pt-8 border-t border-slate-200 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-slate-500 dark:text-slate-500 text-xs">
+                    © 2024 PrevCar Bosch Service. Todos os direitos reservados.
+                </p>
+                <p class="text-slate-500 dark:text-slate-500 text-xs flex items-center gap-1">
+                    Desenvolvido com <span class="text-primary text-base">♥</span> para Icó e Região
+                </p>
+            </div>
+        </div>
+    </footer>
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/5588997535053" target="_blank"
+        class="fixed bottom-6 right-6 z-[100] bg-[#25d366] hover:bg-[#128c7e] text-white w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all hover:scale-110 active:scale-95 group overflow-visible"
+        aria-label="Chamar no WhatsApp">
+        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+        </svg>
+        <span
+            class="absolute right-full mr-4 bg-white dark:bg-slate-800 text-slate-900 dark:text-white px-3 py-1.5 rounded-lg text-sm font-bold shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap border border-slate-100 dark:border-slate-700">
+            Falar com a PrevCar
+        </span>
+    </a>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Hero Carousel Logic
+            const carousel = document.getElementById('hero-carousel');
+            const slides = carousel.querySelectorAll('.carousel-slide');
+            const indicatorsRoot = document.getElementById('indicators');
+            let currentSlide = 0;
+            let autoPlayTimer;
+
+            // Interactive Carousel Implementation (3D Style)
+            function updateCarousel() {
+                slides.forEach((slide, idx) => {
+                    slide.className = 'carousel-slide'; // Reset
+                    
+                    if (idx === currentSlide) {
+                        slide.classList.add('active');
+                    } else if (idx === (currentSlide - 1 + slides.length) % slides.length) {
+                        slide.classList.add('prev');
+                    } else if (idx === (currentSlide + 1) % slides.length) {
+                        slide.classList.add('next');
+                    } else if (idx < currentSlide) {
+                        slide.classList.add('hidden-left');
+                    } else {
+                        slide.classList.add('hidden-right');
+                    }
+                });
+
+                tabs.forEach((tab, idx) => {
+                    tab.classList.toggle('active', idx === currentSlide);
+                });
+
+                // Auto-scroll tabs sem forçar rolagem vertical da página principal
+                if (tabs[currentSlide]) {
+                    const activeTab = tabs[currentSlide];
+                    const tabCenter = activeTab.offsetLeft + (activeTab.clientWidth / 2);
+                    const scrollTarget = tabCenter - (indicatorsRoot.clientWidth / 2);
+                    indicatorsRoot.scrollTo({ left: scrollTarget, behavior: 'smooth' });
+                }
+            }
+
+            function goToSlide(n) {
+                currentSlide = (n + slides.length) % slides.length;
+                updateCarousel();
+                resetTimer();
+            }
+
+            // Expose goToSlide globally for onclick handlers
+            window.goToSlide = goToSlide;
+
+            // Generate Tabs
+            slides.forEach((_, idx) => {
+                const tab = document.createElement('div');
+                tab.classList.add('carousel-tab');
+                if (idx === 0) tab.classList.add('active');
+                const num = (idx + 1).toString().padStart(2, '0');
+                tab.innerHTML = `<span>${num}</span>`;
+                tab.addEventListener('click', () => goToSlide(idx));
+                indicatorsRoot.appendChild(tab);
+            });
+
+            const tabs = indicatorsRoot.querySelectorAll('.carousel-tab');
+            updateCarousel(); // Initial render
+
+            function nextSlide() {
+                goToSlide(currentSlide + 1);
+            }
+
+            function resetTimer() {
+                clearInterval(autoPlayTimer);
+                autoPlayTimer = setInterval(nextSlide, 6000);
+            }
+
+            resetTimer();
+
+            // Mobile Menu Logic
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileCloseBtn = document.getElementById('mobile-close-btn');
+            const mobileLinks = mobileMenu.querySelectorAll('a');
+
+            if (mobileMenuBtn && mobileMenu) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    mobileMenu.classList.remove('translate-x-full', 'invisible', 'pointer-events-none');
+                    document.body.style.overflow = 'hidden';
+                });
+
+                const closeMenu = () => {
+                    mobileMenu.classList.add('translate-x-full', 'invisible', 'pointer-events-none');
+                    document.body.style.overflow = '';
+                };
+
+                mobileCloseBtn.addEventListener('click', closeMenu);
+                mobileLinks.forEach(link => link.addEventListener('click', closeMenu));
+            }
+        });
+    </script>
+</body>
+
+</html>
